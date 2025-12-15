@@ -1,5 +1,8 @@
 class BankAccount {
+  static #totalNumberOfAccounts = 0; // Add static private property
+
   #balance = 0;
+
   constructor(accountNumber, ownerName) {
     this.accountNumber = accountNumber;
     this.ownerName = ownerName;
@@ -7,23 +10,23 @@ class BankAccount {
   }
 
   deposit(amount) {
-    this.balance += amount;
-    console.log(`Deposited $${amount}. New balance: $${this.balance}`);
-    return this.balance;
+    this.#balance += amount; // balance is private
+    console.log(`Deposited $${amount}. New balance: $${this.#balance}`); // balance is private
+    return this.#balance; // balance is private
   }
 
   withdraw(amount) {
-    if (amount > this.balance) {
+    if (amount > this.#balance) { // balance is private
       console.log(`Withdrawal failed. Insufficient funds.`);
     } else {
-      this.balance -= amount;
-      console.log(`Withdrew $${amount}. New balance: $${this.balance}`);
+      this.#balance -= amount; // balance is private
+      console.log(`Withdrew $${amount}. New balance: $${this.#balance}`); // balance is private
     }
-    return this.balance;
+    return this.#balance; // balance is private
   }
 
   getBalance() {
-    return #balance;
+    return this.#balance; // #balance;
   }
 
   static getTotalNumberOfAccounts() {
@@ -32,30 +35,55 @@ class BankAccount {
 }
 
 class Bank {
-  accounts = [];
   constructor(name) {
     this.name = name;
+    this.accounts = []; // should be in constructor
   }
 
   addAccount(account) {
-    accounts.push(account);
+    this.accounts.push(account); // should be this.accounts
   }
 
   getTotalBalance() {
     let total = 0;
-    this.accounts.forEach((account) => {
-      total += account.balance;
+    this.accounts.forEach((account) => { // should be this.accounts
+      total += account.getBalance(); // added .getBalance() instead of .balance
     });
     return total;
   }
 
-  findAccount(accountNumber) {
-    return accounts.find((account) => account.accountNumber = accountNumber);
+  findAccount(accountNumber) { // should be this.accounts
+    return this.accounts.find((account) => account.accountNumber = accountNumber);
   }
 }
 
 // TEST YOUR CODE HERE
 
+const myBank = new Bank('First National');
+console.log(myBank); // Bank { name: "First National" }
+
+const account1 = new BankAccount('001', 'Alice');
+const account2 = new BankAccount('002', 'Bob');
+console.log(account1); // BankAccount { accountNumber: "001", ownerName: "Alice" }
+console.log(account2); // BankAccount { accountNumber: "002", ownerName: "Bob" }
+
+myBank.addAccount(account1);
+myBank.addAccount(account2);
+console.log(myBank.accounts);
+/*
+[
+  BankAccount { accountNumber: "001", ownerName: "Alice" },
+  BankAccount { accountNumber: "002", ownerName: "Bob" }
+]
+*/
+
+account1.deposit(100); // Deposited $100. New Balance: 100
+account1.withdraw(50); // Withdrew $50. New Balance: 50
+account2.deposit(250); // Deposited $250. New Balance: 250
+console.log(myBank.getTotalBalance()); // 300
+
+console.log(myBank.findAccount('001').ownerName); // "Alice"
+console.log('Total accounts:', BankAccount.getTotalNumberOfAccounts()); // Should be 2
 
 // DO NOT REMOVE
 module.exports = { BankAccount, Bank };
